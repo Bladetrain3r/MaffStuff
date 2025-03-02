@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from random import randint
 
 def collatz_sequence(n):
     """Generates the Collatz sequence for a given number n."""
     sequence = [n]
-    while n != 1:
+    while n != 1 and len(sequence) < 100:  # Prevent infinite loops
         if n % 2 == 0:
             n //= 2
         else:
@@ -42,8 +43,8 @@ def plot_slope_battle(sequence, start_number, label=None):
     
     plt.figure(figsize=(10, 6))
     
-    plt.plot(positive_slopes, label='Cumulative Positive Slope (3n+1)', color='red')
-    plt.plot(negative_slopes, label='Cumulative Negative Slope (n/2)', color='blue')
+    plt.plot(positive_slopes, label='Cumulative Positive Slope(3n+1)', color='red')
+    plt.plot(negative_slopes, label='Cumulative Negative Slope(n/2)', color='blue')
     
     # Find the point where the negative slope surpasses the positive slope
     convergence_point = None
@@ -76,10 +77,43 @@ numbers = {
     27: "Known Long Sequence",
     19: "Random",
     42: "interesting",
-    134: "Leads to 40"
+    134: "Leads to 40",
+    randint(1, 1000): "Random",
+    randint(1, 1000): "Random"
 }
 
 # Plot slope battles for each number
-for number, label in numbers.items():
+# for number, label in numbers.items():
+#   sequence = collatz_sequence(number)
+#   plot_slope_battle(sequence, number, label)
+
+    # Calculate average slopes across all sequences
+all_positive_slopes = []
+all_negative_slopes = []
+max_length = 0
+
+# First pass to get sequences and find max length
+for number in numbers.keys():
     sequence = collatz_sequence(number)
-    plot_slope_battle(sequence, number, label)
+    pos_slopes, neg_slopes = calculate_slopes(sequence)
+    all_positive_slopes.append(pos_slopes)
+    all_negative_slopes.append(neg_slopes)
+    max_length = max(max_length, len(pos_slopes))
+# Pad sequences to same length
+padded_pos = [np.pad(slopes, (0, max_length - len(slopes)), 'constant', constant_values=slopes[-1]) 
+              for slopes in all_positive_slopes]
+padded_neg = [np.pad(slopes, (0, max_length - len(slopes)), 'constant', constant_values=slopes[-1]) 
+              for slopes in all_negative_slopes]
+# Calculate averages
+avg_positive = np.mean(padded_pos, axis=0)
+avg_negative = np.mean(padded_neg, axis=0)
+# Plot average slopes
+plt.figure(figsize=(10, 6))
+plt.plot(avg_positive, label='Average Positive Slope (3n+1)', color='red')
+plt.plot(avg_negative, label='Average Negative Slope', color='blue')
+plt.xlabel("Step")
+plt.ylabel("Average Cumulative Slope")
+plt.title("Average Slope Battle Across All Numbers")
+plt.legend()
+plt.grid(True)
+plt.show()
