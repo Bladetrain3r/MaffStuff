@@ -1,15 +1,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from random import randint
 
 def collatz_sequence(n):
     """Generates the Collatz sequence for a given number n."""
     sequence = [n]
-    while n != 1 and len(sequence) < 100:  # Prevent infinite loops
+    while n != 1:
         if n % 2 == 0:
             n //= 2
         else:
-            n = 5 * n + 1
+            n = 3 * n + 1
         sequence.append(n)
     return sequence
 
@@ -43,8 +42,8 @@ def plot_slope_battle(sequence, start_number, label=None):
     
     plt.figure(figsize=(10, 6))
     
-    plt.plot(positive_slopes, label='Cumulative Positive Slope(5n+1)', color='red')
-    plt.plot(negative_slopes, label='Cumulative Negative Slope(n/2)', color='blue')
+    plt.plot(positive_slopes, label='Cumulative Positive Slope (3n+1)', color='red')
+    plt.plot(negative_slopes, label='Cumulative Negative Slope (n/2)', color='blue')
     
     # Find the point where the negative slope surpasses the positive slope
     convergence_point = None
@@ -77,9 +76,7 @@ numbers = {
     27: "Known Long Sequence",
     19: "Random",
     42: "interesting",
-    134: "Leads to 40",
-    randint(1, 1000): "Random",
-    randint(1, 1000): "Random"
+    134: "Leads to 40"
 }
 
 # Plot slope battles for each number
