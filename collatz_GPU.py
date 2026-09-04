@@ -129,27 +129,23 @@ class CollatzSphereViewer:
             return normalize(p);  // Ensure unit sphere
         }
         
-        // Map 3D position to Collatz number (with overflow protection)
-        int position_to_number(vec3 pos) {
-            float r = length(pos);
-            
-            // Use logarithmic scaling to prevent overflow
-            float log_n = r * scale_exponent * 0.693147; // ln(2) = 0.693147
-            
-            // Cap at reasonable maximum to prevent overflow
-            if (log_n > 20.0) {
-                log_n = 20.0; // e^20 ≈ 485 million
-            }
-            
-            int n = int(exp(log_n));
-            
-            // Apply pattern-based adjustments (safely)
-            if (n > 0 && n < 1000000000) {
-                if ((n & 0x5) == 0x5) n = min(int(n * 1.1), 1000000000);
-                if ((n & 0x7) == 0x7) n = int(n * 0.9);
-            }
-            
-            return max(1, min(n, 1000000000));
+        // Map lattice index to Collatz number.
+        //
+        // This previously derived the number from length(pos).  Every point
+        // on a unit sphere has length 1.0, so all points received the same
+        // integer; at the default scale_exponent that integer also tripped
+        // the overflow guard, so every point failed the convergence test and
+        // the window drew nothing.  The number belongs to the index, which is
+        // the thing that actually varies from point to point.
+        //
+        // scale_exponent now selects the range: the lattice spans the
+        // integers 1 .. 2^scale_exponent.  The cap keeps 3n+1 inside int32;
+        // see collatz_sphere_headless.py for an fp64 version that follows
+        // trajectory peaks past 2^32 exactly.
+        int index_to_number(float idx) {
+            float span = pow(2.0, min(scale_exponent, 28.0));
+            float n = 1.0 + floor(idx / max(point_count, 1.0) * span);
+            return int(clamp(n, 1.0, 715827882.0));
         }
         
         // Check if number is power of two
@@ -234,7 +230,7 @@ class CollatzSphereViewer:
             FragPos = sphere_pos;
             
             // Calculate Collatz properties
-            int n = position_to_number(sphere_pos);
+            int n = index_to_number(effective_index);
             calculate_collatz(n);
             
             // Only show converged points
