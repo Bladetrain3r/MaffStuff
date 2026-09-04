@@ -153,6 +153,23 @@ def trajectory(n: int, max_steps: int = 100_000) -> TrajectoryMetrics:
     first_power_value = n if first_power_step == 0 else None
     first_descent = None
 
+    if n == 1:
+        return TrajectoryMetrics(
+            start=1,
+            steps=0,
+            sequence_length=1,
+            total_stopping_time=0,
+            first_power_of_two_step=0,
+            first_power_of_two_value=1,
+            first_descent_step=None,
+            maximum_value=1,
+            odd_steps=0,
+            even_steps=0,
+            converged=True,
+            termination="reached_one",
+            sequence=(1,),
+        )
+
     for step in range(1, max_steps + 1):
         current = collatz_step(current)
         values.append(current)
@@ -255,6 +272,6 @@ def l_harbor_rows(max_k: int) -> Iterator[dict]:
             "first_power_of_two": metrics.first_power_of_two_value,
             "total_stopping_time": metrics.total_stopping_time,
             "sequence_length": metrics.sequence_length,
-            "expected_stopping_time": 2 * k + 1,
-            "expected_sequence_length": 2 * k + 2,
+            "expected_stopping_time": 0 if k == 1 else 2 * k + 1,
+            "expected_sequence_length": 1 if k == 1 else 2 * k + 2,
         }

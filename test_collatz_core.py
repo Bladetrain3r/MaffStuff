@@ -36,6 +36,12 @@ class CanonicalMetricsTests(unittest.TestCase):
         self.assertIsNone(metrics.total_stopping_time)
         self.assertEqual(metrics.termination, "max_steps")
 
+    def test_one_is_already_converged(self):
+        metrics = trajectory(1)
+        self.assertTrue(metrics.converged)
+        self.assertEqual(metrics.total_stopping_time, 0)
+        self.assertEqual(metrics.sequence, (1,))
+
     def test_binary_features_are_reproducible(self):
         features = binary_features(85)
         self.assertEqual(features["binary"], "1010101")
@@ -55,7 +61,7 @@ class CohortTests(unittest.TestCase):
         rows = list(l_harbor_rows(4))
         self.assertEqual(
             [row["total_stopping_time"] for row in rows],
-            [3, 5, 7, 9],
+            [0, 5, 7, 9],
         )
         self.assertTrue(all(
             row["sequence_length"] == row["expected_sequence_length"]

@@ -21,7 +21,7 @@ line interface is `/home/runner/work/MaffStuff/MaffStuff/collatz_research.py`.
 
 ## Exact mathematical component
 
-For `k >= 1`, define
+For `k >= 2`, define
 
 \[
 L_k = \frac{2^{2k}-1}{3}.
@@ -33,6 +33,9 @@ Then `3 L_k + 1 = 2^(2k)`, and the binary representation of `L_k` is
 - first power-of-two hit: step `1`;
 - total stopping time: `2k + 1`;
 - number of visited values: `2k + 2`.
+
+The algebraic extension `L_1=1` is retained by the implementation as the
+degenerate endpoint, with stopping time zero and one visited value.
 
 For an odd positive integer `m`, the exact secondary set is
 
